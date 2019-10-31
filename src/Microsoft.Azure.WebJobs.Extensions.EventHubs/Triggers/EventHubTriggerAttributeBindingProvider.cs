@@ -58,6 +58,7 @@ namespace Microsoft.Azure.WebJobs.EventHubs
 
             string consumerGroup = attribute.ConsumerGroup ?? PartitionReceiver.DefaultConsumerGroupName;
             string resolvedConsumerGroup = _nameResolver.ResolveWholeString(consumerGroup);
+            bool checkpointOnFailure = attribute.CheckpointOnFailure;
 
             if (!string.IsNullOrWhiteSpace(attribute.Connection))
             {
@@ -71,7 +72,7 @@ namespace Microsoft.Azure.WebJobs.EventHubs
             Func<ListenerFactoryContext, bool, Task<IListener>> createListener =
              (factoryContext, singleDispatch) =>
              {
-                 IListener listener = new EventHubListener(factoryContext.Executor, eventHostListener, singleDispatch, _options.Value, _logger);
+                 IListener listener = new EventHubListener(factoryContext.Executor, eventHostListener, singleDispatch, _options.Value, checkpointOnFailure, _logger);
                  return Task.FromResult(listener);
              };
 
